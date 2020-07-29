@@ -1,5 +1,9 @@
 import requests as r
 
+from datetime import datetime
+from datetime import timezone
+
+
 class CameraControl:
 	def __init__(self, cam_ip):
 		self.cam_ip = cam_ip
@@ -251,6 +255,14 @@ class CameraControl:
 		else:
 			print (resp.text)
 			return False
+
+	def set_date(self, new_date=None):
+		if new_date is None:
+			new_date = datetime.now(tz=timezone.utc).astimezone()
+		value = new_date.strftime('%Y%m%d%H%M%S%z')
+		params = {"mode": "setsetting", "type": "clock", "value": value}
+		resp = r.get(self.baseurl, params = params)
+		return resp
 
 	def get_state(self):
 		params = {"mode": "getstate"}
