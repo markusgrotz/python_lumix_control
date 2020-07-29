@@ -252,6 +252,12 @@ class CameraControl:
 			print (resp.text)
 			return False
 
+	def get_state(self):
+		params = {"mode": "getstate"}
+		resp = r.get(self.baseurl, params = params)
+		return resp
+
+
 if __name__ == "__main__":
 	IP = "10.0.1.105"
 	control = CameraControl(IP) #IP of camera
