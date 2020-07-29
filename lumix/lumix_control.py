@@ -3,6 +3,9 @@ import requests as r
 from datetime import datetime
 from datetime import timezone
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CameraControl:
 	def __init__(self, cam_ip):
@@ -13,17 +16,17 @@ class CameraControl:
 	def start_camera_control(self):
 		resp = r.get(self.baseurl, params = {"mode": "camcmd", "value": "recmode"})
 		if self.check_response(resp):
-			print ("Connected")
+                    logger.debug('Connected to camera {}'.format(self.cam_ip))
 
 	def start_stream(self, upd_port):
 		resp = r.get(self.baseurl, params = {"mode": "startstream", "value": str(upd_port)})
 		if self.check_response(resp):
-			return True
+                    return True
 
 	def stop_stream(self):
 		resp = r.get(self.baseurl, params = {"mode": "stopstream"})
 		if self.check_response(resp):
-			return True
+                    return True
 
 	def get_info(self, setting):
 		params = {"mode": "getinfo", "type": setting}
@@ -71,7 +74,7 @@ class CameraControl:
 			ISO = "50"
 		resp = self.set_setting({"type": "iso", "value": ISO})
 		if self.check_response(resp):
-			print ("ISO set to " + ISO)
+                    logger.debug ('ISO set to {}'.format(ISO))
 
 	def set_focal(self, focal):
 		# 256 between full stops. The rest are third stops.
@@ -108,7 +111,7 @@ class CameraControl:
 		}
 		resp = self.set_setting({"type": "focal", "value": fstop[focal] })
 		if self.check_response(resp):
-			print ("F Stop set to " + focal)
+                    logger.debug('f stop set to {}'.format(focal))
 
 	def set_shutter(self, shutter):
 		# 256 between full stops. 1 second is the pos/neg boundary
@@ -173,13 +176,13 @@ class CameraControl:
 		}
 		resp = self.set_setting({"type": "shtrspeed", "value": shutter_speed[shutter] })
 		if self.check_response(resp):
-			print ("Shutter set to " + shutter)
+                    logger.debug('shutter set to {}'.format(shutter))
 
 	def set_video_quality(self, quality="mp4ed_30p_100mbps_4k"):
 		# mp4_24p_100mbps_4k / mp4_30p_100mbps_4k
 		resp = self.set_setting({"type": "videoquality", "value": quality})
 		if self.check_response(resp):
-			print ("Video quality set to " + quality)
+                    logger.debug('video quality set to {]'.format(quality))
 		return resp
 
 	def focus_control(self, direction="tele", speed="normal"):
@@ -251,10 +254,10 @@ class CameraControl:
 	def check_response(self, resp):
 		# Get a 200 response even on error. Have to check <result>
 		if "<result>ok</result>" in resp.text:
-			return True
+                    return True
 		else:
-			print (resp.text)
-			return False
+                    logger.error('Response is {}'.format(resp.text))
+                    return False
 
 	def set_date(self, new_date=None):
 		if new_date is None:
